@@ -1,9 +1,12 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product } from './ProductContext';
+import Notification from '../components/Notification';
 
 interface CartItem extends Product {
   quantity: number;
 }
+
+
 
 interface CartContextType {
   cart: CartItem[];
@@ -16,8 +19,10 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
+const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [notification, setNotification] = useState<string | null>(null);
+  const [showNotification, setShowNotification] = useState(false);
 
   const addToCart = (product: Product) => {
     setCart(currentCart => {
@@ -29,9 +34,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             : item
         );
       }
+      setNotification(`Added ${product.name} to cart`);
+      setShowNotification(true);
       return [...currentCart, { ...product, quantity: 1 }];
     });
   };
+
+  useEffect(() => {
+    if (showNotification) {
+      const timeout = setTimeout(() => {
+        setShowNotification(false);
+      }, 3000);
+      return () => clearTimeout(timeout);
+    }
+  }, [showNotification]);
 
   const removeFromCart = (productId: number) => {
     setCart(currentCart => currentCart.filter(item => item.id !== productId));
@@ -62,9 +78,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeFromCart,
       updateQuantity,
       clearCart,
-      total
+      total,
     }}>
       {children}
+    {showNotification && (
+      <Notification message={notification!} onClose={() => setShowNotification(false)} />
+    )}
     </CartContext.Provider>
   );
 }
@@ -76,3 +95,5 @@ export function useCart() {
   }
   return context;
 }
+
+export {CartProvider};

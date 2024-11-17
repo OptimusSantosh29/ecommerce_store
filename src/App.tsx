@@ -9,6 +9,7 @@ import Footer from './components/Footer';
 import Cart from './components/Cart';
 import { ProductProvider } from './context/ProductContext';
 import { CartProvider } from './context/CartContext';
+import SearchPage from './components/SearchPage';
 
 function Home() {
   return (
@@ -33,6 +34,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/:category" element={<FeaturedProducts />} />
+                <Route path="/search" element={<SearchPage />} />
               </Routes>
             </main>
             <Footer />
